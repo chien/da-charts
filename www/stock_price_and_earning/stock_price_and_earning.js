@@ -5,54 +5,77 @@
 
     function successCallBack(data) {
       vm.data = data;
+      vm.d3Data = [];
+      var groupedData = {};
+
+      angular.forEach(vm.data, function(element, key) {
+        var d3Datum = {
+          x: element.stock_purchased_at,
+          y: element.stock_sold_at,
+          size: element.price_change_perc * 10,
+          shape: 'circle'
+        };
+
+        if (element.industry in groupedData) {
+          groupedData[element.industry].push(d3Datum);
+        } else {
+          groupedData[element.industry] = [d3Datum];
+        }
+      });
+
+      angular.forEach(groupedData, function(elementList, industryName) {
+        vm.d3Data.push({
+          key: industryName,
+          values: groupedData[industryName]
+        });
+      });
     }
 
     function getData() {
       JsonFileUrl.query(successCallBack);
     }
 
+    function setD3ChartOptions() {
+      vm.options = {
+        chart: {
+          type: 'scatterChart',
+          height: 450,
+          color: d3.scale.category10().range(),
+          scatter: {
+            onlyCircles: false
+          },
+          showDistX: true,
+          showDistY: true,
+          duration: 350,
+          xAxis: {
+            axisLabel: 'Stock Purchased At (Earning Release Date - N)',
+            tickFormat: function(d){
+              return d3.format('2d')(d);
+            }
+          },
+          yAxis: {
+            axisLabel: 'Stock Sold At (Earning Release Date + N)',
+            tickFormat: function(d){
+              return d3.format('2d')(d);
+            },
+            axisLabelDistance: -5
+          },
+          zoom: {
+            //NOTE: All attributes below are optional
+            enabled: true,
+            scaleExtent: [1, 10],
+            useFixedDomain: false,
+            useNiceScale: false,
+            horizontalOff: false,
+            verticalOff: false,
+            unzoomEventType: 'dblclick.zoom'
+          }
+        }
+      };
+    }
+
     function activateExposedProperties() {
       getData();
-      vm.options = {
-    chart: {
-        type: 'discreteBarChart',
-        height: 450,
-        margin : {
-            top: 20,
-            right: 20,
-            bottom: 60,
-            left: 55
-        },
-        x: function(d){ return d.label; },
-        y: function(d){ return d.value; },
-        showValues: true,
-        valueFormat: function(d){
-            return d3.format(',.4f')(d);
-        },
-        transitionDuration: 500,
-        xAxis: {
-            axisLabel: 'X Axis'
-        },
-        yAxis: {
-            axisLabel: 'Y Axis',
-            axisLabelDistance: 30
-        }
-    }
-};
-
-vm.d3_data = [{
-    key: "Cumulative Return",
-    values: [
-        { "label" : "A" , "value" : -29.765957771107 },
-        { "label" : "B" , "value" : 0 },
-        { "label" : "C" , "value" : 32.807804682612 },
-        { "label" : "D" , "value" : 196.45946739256 },
-        { "label" : "E" , "value" : 0.19434030906893 },
-        { "label" : "F" , "value" : -98.079782601442 },
-        { "label" : "G" , "value" : -13.925743130903 },
-        { "label" : "H" , "value" : -5.1387322875705 }
-    ]
-}];
     }
 
     function activateExposedFunctions() {
@@ -62,6 +85,7 @@ vm.d3_data = [{
     function activate() {
       activateExposedProperties();
       activateExposedFunctions();
+      setD3ChartOptions();
     }
 
     // finally initialise the controller

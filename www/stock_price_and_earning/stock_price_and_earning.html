@@ -1,0 +1,21 @@
+<h3>Stock Price and Earngin</h3>
+<div ng-controller="StockPriceAndEarningCtrl as ul">
+  <table class='stack'>
+    <thead>
+      <tr>
+        <th>industry</th>
+        <th>stock_purchased_at</th>
+        <th>stock_sold_at</th>
+        <th>price_change_perc</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="price_data in ul.data | orderBy:'-industry'">
+        <td> {{price_data.industry}} </td>
+        <td> {{price_data.stock_purchased_at}} </td>
+        <td> {{price_data.stock_sold_at}} </td>
+        <td> {{price_data.price_change_perc}} </td>
+      </tr>
+    </li>
+  </ul>
+</div>

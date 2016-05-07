@@ -7,6 +7,7 @@
     'ngResource',
     'ngCookies',
     'base64',
+    'nvd3',
     'DAChart.stock_price_and_earning',
     'DAChart.version'
   ]).
